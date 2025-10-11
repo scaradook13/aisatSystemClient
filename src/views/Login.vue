@@ -7,7 +7,7 @@
         </div>
       </div>
 
-      <h2 class="text-2xl font-bold text-center mb-2">Student Login</h2>
+      <h2 class="text-2xl font-bold text-center mb-2">Login Portal</h2>
       <p class="text-gray-500 text-center mb-6">
         Enter your credentials to access your account
       </p>
