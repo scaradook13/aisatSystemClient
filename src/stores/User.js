@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('User', () => {
     const user = ref('')
-    const section = ref('GC1MA')
+    const section = ref('')
   return { 
     user,
     section

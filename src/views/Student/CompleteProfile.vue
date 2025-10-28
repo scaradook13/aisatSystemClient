@@ -13,107 +13,90 @@
         <h1
           class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight text-center"
         >
-          Login Portal
+          Complete Your Profile
         </h1>
         <p class="text-gray-500 text-sm sm:text-base text-center mt-1">
-          Access your student or admin account
+          Please fill in your full name and section to finish setting up your account.
         </p>
       </div>
 
       <!-- Form -->
-      <form @submit.prevent="handleLogin" class="space-y-5 sm:space-y-6">
-        <!-- Email -->
+      <form @submit.prevent="handleCompleteProfile" class="space-y-5 sm:space-y-6">
+
+        <!-- Full Name -->
         <div class="relative">
           <input
-            v-model="email"
+            v-model="fullName"
             type="text"
-            id="email"
+            id="fullName"
             placeholder=" "
-            class="peer w-full border border-gray-300 rounded-xl px-3 pt-6.5 pb-2 text-gray-900 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            class="peer w-full border border-gray-300 rounded-xl px-3 pt-5 pb-2 text-gray-900 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             required
           />
           <label
-            for="email"
+            for="fullName"
             class="absolute left-3 top-2 text-gray-500 text-sm transition-all 
                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base 
                    peer-placeholder-shown:text-gray-400 peer-focus:top-2 
                    peer-focus:text-sm peer-focus:text-blue-600"
           >
-            Email Address
+            Full Name
           </label>
-          <p v-if="emailError" class="text-red-500 text-xs mt-1">
-            {{ emailError }}
+          <p v-if="fullNameError" class="text-red-500 text-xs mt-1">
+            {{ fullNameError }}
           </p>
         </div>
 
-        <!-- Password -->
+        <!-- Section -->
         <div class="relative">
           <input
-            v-model="password"
-            type="password"
-            id="password"
+            v-model="section"
+            type="text"
+            id="section"
             placeholder=" "
-            class="peer w-full border border-gray-300 rounded-xl px-3 pt-6.5 pb-2 text-gray-900 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            class="peer w-full border border-gray-300 rounded-xl px-3 pt-5 pb-2 
+                   text-gray-900 text-sm sm:text-base focus:outline-none 
+                   focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             required
           />
           <label
-            for="password"
+            for="section"
             class="absolute left-3 top-2 text-gray-500 text-sm transition-all 
                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base 
                    peer-placeholder-shown:text-gray-400 peer-focus:top-2 
                    peer-focus:text-sm peer-focus:text-blue-600"
           >
-            Password
+            Section
           </label>
-          <p v-if="passwordError" class="text-red-500 text-xs mt-1">
-            {{ passwordError }}
+          <p v-if="sectionError" class="text-red-500 text-xs mt-1">
+            {{ sectionError }}
           </p>
         </div>
 
-        <!-- Forgot Password -->
-        <div class="flex justify-end">
-          <a
-            href="#"
-            class="text-blue-600 text-sm sm:text-base font-medium hover:underline"
-          >
-            Forgot password?
-          </a>
-        </div>
-
-        <!-- Sign In Button -->
+        <!-- Save Button -->
         <button
           type="submit"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold 
                  py-2.5 sm:py-3 text-sm sm:text-base rounded-xl transition-all 
                  shadow-md hover:shadow-lg active:scale-[0.98]"
         >
-          Sign In
+          Save Profile
         </button>
       </form>
-
-      <!-- Footer -->
-      <p class="text-center text-xs sm:text-sm text-gray-500 mt-6 sm:mt-8">
-        Don’t have an account?
-        <RouterLink
-          to="/register"
-          class="text-blue-600 font-medium hover:underline"
-        >
-          Register Here
-        </RouterLink>
-      </p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia'
 import { User } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/AuthStore'
 
 const authStore = useAuthStore()
-const { email, password, emailError, passwordError } = storeToRefs(authStore)
+const { fullName, section, fullNameError, sectionError } = storeToRefs(authStore)
 
-const handleLogin = () => {
-  authStore.login()
+const handleCompleteProfile = () => {
+  authStore.completeProfile()
 }
 </script>
