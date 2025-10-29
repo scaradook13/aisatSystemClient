@@ -6,6 +6,7 @@ import { useToast } from "vue-toastification";
 const toast = useToast();
 
 export const useAuthStore = defineStore('Auth', () => {
+    const id = ref('')
     const studentNumber = ref('')
     const email = ref('')
     const password = ref('')
@@ -91,7 +92,7 @@ export const useAuthStore = defineStore('Auth', () => {
   const getUser = async () => {
     try {
       const response = await AuthService.getUser()
-
+      id.value = response._id || ''
       email.value = response.email || ''
       role.value = response.role || ''
       isProfileComplete.value = response.isProfileComplete || false
@@ -113,6 +114,7 @@ export const useAuthStore = defineStore('Auth', () => {
 
 
   return { 
+    id,
     studentNumber,
     email,
     password,

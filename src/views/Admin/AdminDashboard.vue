@@ -71,10 +71,10 @@ const activeTab = ref('overview')
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: Home },
+  { id: 'evaluation', label: 'Evaluation Form', icon: FileEdit },
   { id: 'teachers', label: 'Teachers', icon: Users },
   { id: 'sections', label: 'Sections', icon: BookOpen },
   { id: 'students', label: 'Students', icon: GraduationCap },
-  { id: 'evaluation', label: 'Evaluation Form', icon: FileEdit },
   { id: 'ranking', label: 'Rankings', icon: Award }
 ]
 

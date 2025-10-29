@@ -10,6 +10,7 @@ export const useAdminStore = defineStore('Admin', () => {
   const teachers = ref([])
   const sections = ref([])
   const students = ref([])
+  const activeForm = ref([])
 
   const addTeacher = async (payload) => {
     try {
@@ -105,7 +106,6 @@ export const useAdminStore = defineStore('Admin', () => {
     try {
       const response = await AdminService.getTeachers()
       teachers.value = response.content?.data || []
-      console.log('Fetched teachers:', teachers.value)
     } catch (err) {
       console.error(err)
       toast.error("Failed to fetch teachers.")
@@ -163,12 +163,142 @@ const updateStudent = async (id, payload) => {
       toast.error("Failed to delete student.")
     }
   }
+  
+  const fetchActiveForm = async () => {
+  try {
+    const response = await AdminService.getForms()
+    activeForm.value = response.content?.data || []
+  } catch (err) {
+    console.error(err)
+    // toast.error("Failed to fetch Form.")
+  }
+}
+
+const addForm = async (payload) => {
+    try {
+      const response = await AdminService.addForm(payload)
+      if (response.content.success) {
+        toast.success("Form added successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to add form.")
+    }
+  }
+
+  const updateForm = async (id, payload) => {
+    try {
+      const response = await AdminService.updateForm(id, payload)
+      if (response.content.success) {
+        toast.success("Form updated successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update form.")
+    }
+  }
+
+  const deleteForm = async (id) => {
+    try {
+      const response = await AdminService.deleteForm(id)
+      if (response.content.success) {
+        toast.success("Form deleted successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to delete form.")
+    }
+  }
+
+  // ===================== CATEGORIES =====================
+  const addCategory = async (payload) => {
+    try {
+      const response = await AdminService.addCategory(payload)
+      if (response.content.success) {
+        toast.success("Category added successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to add category.")
+    }
+  }
+
+  const updateCategory = async (id, payload) => {
+    try {
+      const response = await AdminService.updateCategory(id, payload)
+      if (response.content.success) {
+        toast.success("Category updated successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update category.")
+    }
+  }
+
+  const deleteCategory = async (id) => {
+    try {
+      const response = await AdminService.deleteCategory(id)
+      if (response.content.success) {
+        toast.success("Category deleted successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to delete category.")
+    }
+  }
+
+  // ===================== QUESTIONS =====================
+  const addQuestion = async (payload) => {
+    try {
+      const response = await AdminService.addQuestion(payload)
+      if (response.content.success) {
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to add question.")
+    }
+  }
+
+  const updateQuestion = async (id, payload) => {
+    try {
+      const response = await AdminService.updateQuestion(id, payload)
+      if (response.content.success) {
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update question.")
+    }
+  }
+
+  const deleteQuestion = async (id) => {
+    try {
+      const response = await AdminService.deleteQuestion(id)
+      if (response.content.success) {
+        toast.success("Question deleted successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.content.message)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to delete question.")
+    }
+  }
+
+
 
 
   return {
     teachers,
     sections,
     students,
+    activeForm,
     addTeacher,
     addSection,
     updateTeacher,
@@ -180,5 +310,15 @@ const updateStudent = async (id, payload) => {
     fetchStudents,
     updateStudent,
     deleteStudent,
+    fetchActiveForm,
+    addForm,
+    updateForm,
+    deleteForm,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    addQuestion,
+    updateQuestion,
+    deleteQuestion,
   }
 })
