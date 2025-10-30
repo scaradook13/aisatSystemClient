@@ -104,7 +104,16 @@ export const useAuthStore = defineStore('Auth', () => {
         studentNumber.value = response.profile.studentNumber || ''
       }
     } catch (error) {
-      console.error('Failed to fetch user:', error)
+      throw error
+    }
+  }
+
+  const logout = async () => {
+    try {
+      const response = await AuthService.logout()
+
+    } catch (error) {
+      console.error('Failed to logout', error)
       throw error
     }
   }
@@ -137,5 +146,6 @@ export const useAuthStore = defineStore('Auth', () => {
     verifyAccount,
     login,
     getUser,
+    logout
    }
 })

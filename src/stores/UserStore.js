@@ -1,17 +1,15 @@
 import { ref, reactive, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { storeToRefs } from 'pinia'
 import UserService from '@/api/UserService'
-import { useAuthStore } from './AuthStore'
 
 
 export const useUserStore = defineStore('User', () => {
-  const authStore = useAuthStore()
-  const studentId = ref(authStore.id)
-  const { section } = storeToRefs(authStore);
+  const studentId = ref('')
+  const section = ref('')
   const selectedTeacher = ref('')
   const ratings = ref({})
   const comment = ref()
+  const teacherEvaluated = ref([])
 
   const setRating = (questionId, rating) => {
     ratings.value[questionId] = rating;
@@ -36,12 +34,32 @@ export const useUserStore = defineStore('User', () => {
       }
     }
 
+    const fetchStudentInfo = async () => {
+      try {
+        const response = await UserService.getStudentInfo()
+        console.log("Full student info response:", response)
+
+        const userData = response.data // 👈 correct level
+
+        studentId.value = userData._id
+        section.value = userData.profile.section
+        teacherEvaluated.value = userData.profile.teacherEvaluated || []
+
+        console.log("Fetched teacherEvaluated:", teacherEvaluated.value)
+      } catch (err) {
+        console.error(err)
+        toast.error("Failed to get student data.")
+      }
+    }
+
   return { 
     setRating,
     addEvaluation,
+    fetchStudentInfo,
     selectedTeacher,
     section,
     ratings,
-    comment
+    comment,
+    teacherEvaluated
    }
 })

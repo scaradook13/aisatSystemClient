@@ -10,6 +10,11 @@ class UserService extends BaseService {
     return response.data;
   }
 
+  async getStudentInfo(id,payload) {
+    const response = await this.api.get(`/getStudentInfo`, payload);
+    return response.data;
+  }
+
 }
 
 export default new UserService();

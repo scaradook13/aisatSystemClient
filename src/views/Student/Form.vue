@@ -1,13 +1,44 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10 px-4">
     <div class="max-w-5xl mx-auto space-y-8">
-      <!-- Header -->
-      <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-800">Faculty Evaluation</h1>
-        <p class="text-gray-500 mt-1">
+    <!-- Header -->
+    <header
+      class="relative flex items-center justify-between w-full flex-wrap p-4"
+    >
+      <!-- Title -->
+      <div class="flex-1 text-center md:text-left">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 leading-tight">
+          AISAT Faculty Evaluation
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
           {{ activeForm.formDate || "Academic Year 2025–2026 | 1st Semester" }}
         </p>
       </div>
+
+      <!-- Logout Button -->
+      <div class="mt-3 md:mt-0 flex justify-center md:justify-end flex-shrink-0">
+        <button
+          @click="handleLogout"
+          class="flex items-center gap-2 bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 transition-all rounded-lg px-3 py-2 shadow-sm text-sm font-medium"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
+            />
+          </svg>
+          <span class="hidden sm:inline">Logout</span>
+        </button>
+      </div>
+    </header>
 
       <!-- Quick Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -20,20 +51,7 @@
             <h2 class="text-2xl font-semibold mt-1">{{ section || "N/A" }}</h2>
           </div>
           <div class="bg-white/20 p-2 rounded-full">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 11c0 3.866-3.582 7-8 7 4.418 0 8-3.134 8-7zm0 0c0-3.866 3.582-7 8-7-4.418 0-8 3.134-8 7z"
-              />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-heart-icon lucide-house-heart"><path d="M8.62 13.8A2.25 2.25 0 1 1 12 10.836a2.25 2.25 0 1 1 3.38 2.966l-2.626 2.856a.998.998 0 0 1-1.507 0z"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
           </div>
         </div>
 
@@ -63,7 +81,7 @@
           <div>
             <p class="text-sm opacity-90">Available Teachers</p>
             <h2 class="text-2xl font-semibold mt-1">
-              {{ filteredInstructors.length }}
+              {{ availableTeachers.length }}
             </h2>
           </div>
           <div class="bg-white/20 p-2 rounded-full">
@@ -95,13 +113,13 @@
           class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="" disabled selected>Choose an instructor...</option>
-          <option
-            v-for="teacher in filteredInstructors"
-            :key="teacher._id"
-            :value="teacher.fullName"
-          >
-            {{ teacher.fullName }}
-          </option>
+        <option
+          v-for="teacher in availableTeachers"
+          :key="teacher._id"
+          :value="teacher.fullName"
+        >
+          {{ teacher.fullName }}
+        </option>
         </select>
       </div>
 
@@ -147,6 +165,12 @@
           :key="question._id"
           class="border border-gray-100 rounded-xl p-4 hover:shadow-md transition mb-4"
           >
+          <p
+            v-if="!ratings[question.id] && isSubmitting"
+            class="text-red-500 text-sm mt-1"
+          >
+            * Required
+          </p>
           <p class="font-medium text-gray-800 mb-3">{{ question.id }}. {{ question.text }}</p>
           <div class="grid grid-cols-5 gap-2">
             <button
@@ -164,6 +188,13 @@
               {{ rating }}
             </button>
           </div>
+        <!-- Validation message -->
+          <p
+            v-if="!ratings[question.id] && showValidationErrors"
+            class="text-red-500 text-sm mt-2"
+          >
+            * Required
+          </p>
         </div>
       </div>
 
@@ -183,14 +214,59 @@
       <!-- Submit -->
       <div v-if="selectedTeacher" class="text-center pt-4">
         <button 
-        @click="addEvaluationHandler()"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-xl shadow-md transition"
+          @click="addEvaluationHandler"
+          :disabled="isSubmitting"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-xl shadow-md transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Submit Evaluation
+          <span v-if="!isSubmitting">Submit Evaluation</span>
+          <span v-else>Submitting...</span>
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Success Modal -->
+<transition name="fade">
+  <div
+    v-if="showSuccessModal"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+  >
+    <div
+      class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full"
+    >
+      <div
+        class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-10 h-10 text-green-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Thank You!</h2>
+      <p class="text-gray-500 mb-6">
+        Your evaluation has been submitted successfully.<br />
+        Your feedback helps us improve our teaching quality.
+      </p>
+      <button
+        @click="handleSubmitAnother"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition"
+      >
+        Submit Another
+      </button>
+    </div>
+  </div>
+</transition>
+
 </template>
 
 <script setup>
@@ -199,20 +275,25 @@ import { storeToRefs } from "pinia";
 import { useAdminStore } from "@/stores/AdminStore";
 import { useAuthStore } from "@/stores/AuthStore";
 import { useUserStore } from "@/stores/UserStore";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 
 const adminStore = useAdminStore();
 const authStore = useAuthStore();
 const userStore = useUserStore();
 
-onMounted(() => {
-  adminStore.fetchActiveForm();
-  adminStore.fetchTeachers();
-});
+onMounted(async () => {
+  await adminStore.fetchActiveForm();
+  await adminStore.fetchTeachers();
+  await userStore.fetchStudentInfo()
+})
+
 
 const { activeForm } = storeToRefs(adminStore);
 const { section } = storeToRefs(authStore);
-const { selectedTeacher, ratings, comment  } = storeToRefs(userStore);
+const { selectedTeacher, ratings, comment, teacherEvaluated } = storeToRefs(userStore);
 
+// --- Instructor filtering ---
 const instructors = computed(() =>
   Array.isArray(adminStore.teachers)
     ? adminStore.teachers
@@ -227,17 +308,89 @@ const filteredInstructors = computed(() => {
   );
 });
 
+const availableTeachers = computed(() => {
+  // Ensure data exists before filtering
+  if (!filteredInstructors.value?.length) return [];
 
-const completed = ref(0);
-const total = ref(7);
+  return filteredInstructors.value.filter(
+    (teacher) =>
+      !teacherEvaluated.value?.includes(teacher.fullName)
+  );
+});
+
+// --- State for progress + submission ---
+const completed = computed(() => teacherEvaluated.value?.length || 0);
+const total = computed(() => filteredInstructors.value.length)
+const isSubmitting = ref(false);
+const showSuccessModal = ref(false);
+const showValidationErrors = ref(false)
 
 
-// const setRating = (questionId, rating) => {
-//   ratings.value[questionId] = rating;
-//   console.log(ratings.value)
-// };
 
-const addEvaluationHandler = () =>{
-  userStore.addEvaluation()
+// ✅ Validate that every question has a rating before submitting
+const isFormValid = computed(() => {
+  if (!activeForm.value || !activeForm.value.formData) return false
+
+  const allQuestions = activeForm.value.formData.flatMap(
+    (cat) => cat.questionsIds || []
+  )
+
+  // Every question must have a rating
+  return allQuestions.every((q) => ratings.value[q.id])
+})
+
+
+const addEvaluationHandler = async () => {
+  if (isSubmitting.value) return
+
+  showValidationErrors.value = true // show missing question messages
+
+  // 🧩 Validation + auto-scroll to first unanswered
+  if (!isFormValid.value) {
+    const firstUnanswered = document.querySelector(".border-gray-100:not(:has(.bg-blue-500))")
+    if (firstUnanswered)
+      firstUnanswered.scrollIntoView({ behavior: "smooth", block: "center" })
+    toast.error("Please rate all questions before submitting.")
+    return
+  }
+
+  try {
+    isSubmitting.value = true
+    await userStore.addEvaluation() // your API call
+    showSuccessModal.value = true
+    showValidationErrors.value = false // reset validation after success
+  } catch (err) {
+    console.error("Error submitting evaluation:", err)
+    toast.error("Something went wrong. Please try again.")
+  } finally {
+    isSubmitting.value = false
+  }
 }
+
+// --- Close Success Modal ---
+const handleSubmitAnother = async () => {
+  selectedTeacher.value = ''
+  ratings.value = {}
+  comment.value = ''
+  await adminStore.fetchActiveForm();
+  await adminStore.fetchTeachers();
+  await userStore.fetchStudentInfo()
+  showSuccessModal.value = false;
+};
+
+const handleLogout = async () => {
+  try {
+    await authStore.logout()
+    toast.success("Logged out successfully.")
+    // 🔄 Refresh the page after logout
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
+  } catch (err) {
+    console.error(err)
+    toast.error("Logout failed.")
+  }
+}
+
 </script>
+
