@@ -180,11 +180,6 @@ const selectedIndex = ref(null)
 const form = ref({ studentNumber: '', fullName: '', section: '' })
 
 // Modal handlers
-const openAddModal = () => {
-  isEditing.value = false
-  form.value = { studentNumber: '', fullName: '', section: '' }
-  showFormModal.value = true
-}
 
 const openEditModal = (index) => {
   isEditing.value = true

@@ -125,6 +125,21 @@ class AdminService extends BaseService {
     const response = await this.api.delete(`/deleteQuestion/${id}`);
     return response.data;
   }
+
+  async addEnrolledStudent(payload) {
+    const response = await this.api.post("/addEnrolledStudent", payload);
+    return response.data;
+  }
+
+  async getAllEnrolledStudents() {
+    const response = await this.api.get("/getAllEnrolledStudents");
+    return response.data;
+  }
+
+  async addEnrolledStudentExcel(payload) {
+    const response = await this.api.post("/addEnrolledStudentExcel", payload);
+    return response.data;
+  }  
 }
 
 export default new AdminService();

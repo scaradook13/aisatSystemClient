@@ -65,6 +65,7 @@ import Sections from '@/components/Admin/Sections.vue'
 import Students from '@/components/Admin/Students.vue'
 import EvaluationForm from '@/components/Admin/EvaluationForm.vue'
 import Ranking from '@/components/Admin/Ranking.vue'
+import EnrolledStudents from '@/components/Admin/EnrolledStudents.vue'
 
 const isSidebarOpen = ref(false)
 const activeTab = ref('overview')
@@ -74,8 +75,9 @@ const tabs = [
   { id: 'evaluation', label: 'Evaluation Form', icon: FileEdit },
   { id: 'teachers', label: 'Teachers', icon: Users },
   { id: 'sections', label: 'Sections', icon: BookOpen },
-  { id: 'students', label: 'Students', icon: GraduationCap },
-  { id: 'ranking', label: 'Rankings', icon: Award }
+  { id: 'enrolledStudents', label: 'Enrolled Students', icon: GraduationCap },
+  { id: 'students', label: 'Registered Students', icon: GraduationCap },
+  { id: 'ranking', label: 'Rankings', icon: Award },
 ]
 
 const componentsMap = {
@@ -84,7 +86,8 @@ const componentsMap = {
   sections: Sections,
   students: Students,
   evaluation: EvaluationForm,
-  ranking: Ranking
+  ranking: Ranking,
+  enrolledStudents: EnrolledStudents
 }
 
 const currentComponent = computed(() => componentsMap[activeTab.value])
