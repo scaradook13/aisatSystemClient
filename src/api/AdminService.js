@@ -140,6 +140,11 @@ class AdminService extends BaseService {
     const response = await this.api.post("/addEnrolledStudentExcel", payload);
     return response.data;
   }  
+
+  async getAllActiveEvaluations() {
+    const response = await this.api.get("/getAllActiveEvaluations");
+    return response.data;
+  }   
 }
 
 export default new AdminService();

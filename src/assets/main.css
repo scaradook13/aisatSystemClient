@@ -1,2 +1,6 @@
-/* ./src/index.css */
 @import "tailwindcss";
+
+/* Optional: Custom spinner for loading */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

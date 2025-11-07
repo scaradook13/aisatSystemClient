@@ -8,6 +8,9 @@ const toast = useToast();
 export const useAuthStore = defineStore('Auth', () => {
     const id = ref('')
     const studentNumber = ref('')
+    const firstName = ref('')
+    const lastName = ref('')
+    const middleName = ref('')
     const email = ref('')
     const password = ref('')
     const confirmPassword = ref('')
@@ -24,70 +27,106 @@ export const useAuthStore = defineStore('Auth', () => {
     const isProfileComplete = ref(false)
     const isAuthenticated = ref(false)
 
-    const registerUser = async (payload) => {
+    const registerUser = async () => {
     try {
-      if (studentNumber.value === '') return studentNumber.value = 'studentNumber is required.'
-      if (email.value === '') return (emailError.value = "Email is required.");
-      if (password.value === '') return passwordError.value = `Password can't be empty`;
-      if (password.value?.length < 8) return passwordError.value = "Password atleast 8 characters";
-      if (password.value !== confirmPassword.value) return confirmPasswordError.value = "Confirm password not match. Please try again"
-      verificationEmail.value = email.value;
+    if (!firstName.value.trim()) return toast.error("First Name is required")
+      if (!lastName.value.trim()) return toast.error("Last Name is required")
 
-      const response = await AuthService.register({
+      if (middleName.value && middleName.value.length < 2) {
+        return toast.error("Middle Name must be at least 2 characters")
+      }
+
+      if (!studentNumber.value) return toast.error("Student Number is required")
+      if (!email.value) return toast.error("Email is required")
+
+      if (!password.value) return toast.error("Password can't be empty")
+      if (password.value.length < 8)
+        return toast.error("Password must be at least 8 characters")
+      if (password.value !== confirmPassword.value)
+        return toast.error("Passwords do not match")
+
+      verificationEmail.value = email.value
+      await AuthService.register({
         studentNumber: studentNumber.value,
         email: email.value,
         password: password.value,
-      });
-      router.push({ name: 'verification' });
+        firstName: firstName.value,
+        middleName: middleName.value,
+        lastName: lastName.value
+      })
+      router.push({ name: 'verification' })
 
     } catch (err) {
-      console.log(err);
-      if (err.response?.data === `This email you've used is already registered but not verified.`) {
-        return unverified.value = true;
-      }
-      emailError.value = err.response?.data
-    };
+      console.log(err)
 
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Registration failed"
+        toast.warning(errorMessage)
+    }
   }
+
   
-  const verifyAccount = async () => {
-    try {
-      const response = await AuthService.verifyAccount({
-        email: verificationEmail.value,
-        otp: otp.value.join(''),
-      });
-      router.push({ name: 'login' });
+    const verifyAccount = async () => {
+      try {
+        const response = await AuthService.verifyAccount({
+          studentNumber: studentNumber.value,
+          email: email.value,
+          password: password.value,
+          firstName: firstName.value,
+          middleName: middleName.value,
+          lastName: lastName.value,
+          otp: otp.value.join(''),
+        });
+        if (response.success) {
+          toast.success(response.message);
+          studentNumber.value = '',
+          email.value = '',
+          password.value = '',
+          firstName.value = '',
+          middleName.value = '',
+          lastName.value = '',
+          router.push({ name: "login" });
+        } else {
+          toast.error(response.message);
+        }
 
-    } catch (err) {
+      } catch (err) {
         console.log(err);
+        toast.error("Verification failed! Please try again.");
+      }
     };
 
-  }
+    const login = async () => {
+      try {
 
-  const login = async () => {
-    try {
+        // Reset errors before validation
+        emailError.value = '';
+        passwordError.value = '';
 
-    if (!email.value.includes('@')) {
-      emailError.value = 'Please enter a valid email address.'
-    }
+        // Email validation
+        if (!email.value.includes('@')) {
+          emailError.value = 'Please enter a valid email address.';
+          toast.error(emailError.value);
+          return;
+        }
 
-    if (!emailError.value && !passwordError.value) {
-
+        // Send login request
         const response = await AuthService.login({
-        email: email.value,
-        password: password.value,
-      });
-      
-      await getUser();
+          email: email.value,
+          password: password.value,
+        });
+
+        await getUser();
         router.push({ name: 'form' });
-        toast.success("Login successful!" );
-    }
+        toast.success("Login successful!");
 
-    } catch (err) {
+      } catch (err) {
         console.log(err);
+        toast.error(err.response?.data || "Something went wrong. Please try again.");
+      }
     };
-
-  }
 
   const getUser = async () => {
     try {
@@ -125,6 +164,9 @@ export const useAuthStore = defineStore('Auth', () => {
   return { 
     id,
     studentNumber,
+    firstName,
+    lastName,
+    middleName,
     email,
     password,
     confirmPassword,

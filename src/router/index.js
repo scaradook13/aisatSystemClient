@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import Verification from '@/views/Verification.vue'
-import CompleteProfile from '@/views/Student/CompleteProfile.vue'
 import Form from '@/views/Student/Form.vue'
 import AdminDashboard from '@/views/Admin/AdminDashboard.vue'
 import { useAuthStore } from '@/stores/AuthStore'
@@ -28,12 +27,6 @@ const router = createRouter({
       name: 'verification',
       component: Verification,
       meta: { guestOnly: true },
-    },
-    {
-      path: '/completeProfile',
-      name: 'completeProfile',
-      component: CompleteProfile,
-      meta: { requiresAuth: true, role: 'Student' },
     },
     {
       path: '/',

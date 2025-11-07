@@ -91,7 +91,7 @@
 
       <!-- Table -->
       <div v-if="filteredStudents.length" class="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-        <div class="max-h-[480px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div class="max-h-[580px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <table class="min-w-full text-sm text-left">
             <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm text-gray-700 font-medium">
               <tr>

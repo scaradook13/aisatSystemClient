@@ -11,6 +11,7 @@ export const useAdminStore = defineStore('Admin', () => {
   const students = ref([])
   const activeForm = ref([])
   const enrolledStudent = ref([])
+  const evaluations = ref([])
 
   // --- Helper for consistent error handling ---
   const handleError = (err, fallbackMessage) => {
@@ -306,11 +307,26 @@ export const useAdminStore = defineStore('Admin', () => {
     }
   }
 
+    const fetchActiveEvaluations = async () => {
+    try {
+        const response = await AdminService.getAllActiveEvaluations();
+
+        if (response.success) {
+        evaluations.value = response.data;
+        } else {
+        toast.error(response.message || "Failed to fetch active evaluations");
+        }
+    } catch (err) {
+        handleError(err, "Failed to fetch active evaluations.");
+    }
+    };
+
   return {
     teachers,
     sections,
     students,
     activeForm,
+    evaluations,
     // Teachers
     addTeacher,
     updateTeacher,
@@ -330,6 +346,7 @@ export const useAdminStore = defineStore('Admin', () => {
     addForm,
     updateForm,
     deleteForm,
+    fetchActiveEvaluations,
     // Categories
     addCategory,
     updateCategory,

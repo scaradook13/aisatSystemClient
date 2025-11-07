@@ -7,8 +7,8 @@
     >
       <!-- Header -->
       <div class="flex flex-col items-center mb-6 sm:mb-8">
-        <div class="bg-blue-600/10 p-3 sm:p-4 rounded-2xl mb-4">
-          <User class="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
+        <div class="bg-blue-600/10 p-3 sm:p-4 rounded-3xl mb-4 flex items-center justify-center">
+          <img src="../assets/aisatLogo.jpg" alt="" class="w-24 h-24 rounded-full object-cover">
         </div>
         <h1
           class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight text-center"
