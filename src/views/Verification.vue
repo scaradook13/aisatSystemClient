@@ -10,9 +10,7 @@
         <div class="bg-blue-600/10 p-3 sm:p-4 rounded-2xl mb-4">
           <MailCheck class="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
         </div>
-        <h1
-          class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight text-center"
-        >
+        <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight text-center">
           Verify Your Account
         </h1>
         <p class="text-gray-500 text-sm sm:text-base text-center mt-1">
@@ -51,10 +49,15 @@
           <button
             type="button"
             @click="resendOTP"
-            :disabled="isResending"
+            :disabled="isResending || countdown > 0"
             class="text-blue-600 font-medium hover:underline disabled:opacity-50"
           >
-            {{ isResending ? 'Resending...' : 'Resend OTP' }}
+            <template v-if="countdown > 0">
+              Resend in {{ countdownDisplay }}
+            </template>
+            <template v-else>
+              Resend OTP
+            </template>
           </button>
         </p>
       </div>
@@ -63,20 +66,26 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onUnmounted, computed } from 'vue'
 import { MailCheck } from 'lucide-vue-next'
-import { storeToRefs } from "pinia";
+import { storeToRefs } from "pinia"
 import { useAuthStore } from '@/stores/AuthStore'
 
 const authStore = useAuthStore()
-const {
-  otp
-} = storeToRefs(authStore)
+const { otp } = storeToRefs(authStore)
 
-// Reactive OTP array for 6 digits
 const isResending = ref(false)
+const countdown = ref(0)
+let timer = null
 
-// Move to next input automatically
+// Format countdown to MM:SS
+const countdownDisplay = computed(() => {
+  const m = Math.floor(countdown.value / 60)
+  const s = countdown.value % 60
+  return `${m}:${s.toString().padStart(2, '0')}`
+})
+
+// Move focus to next input
 const moveFocus = async (index, event) => {
   const value = event.target.value
   if (value && index < otp.value.length - 1) {
@@ -86,17 +95,41 @@ const moveFocus = async (index, event) => {
   }
 }
 
-// Verify handler
+// Verify account
 const handleVerify = () => {
-    authStore.verifyAccount()
+  authStore.verifyAccount()
 }
 
-// Resend handler
-const resendOTP = () => {
-  isResending.value = true
-  setTimeout(() => {
-    alert('A new OTP has been sent to your email.')
-    isResending.value = false
-  }, 2000)
+// Start cooldown timer
+const startCooldown = (seconds = 180) => {
+  countdown.value = seconds
+  timer = setInterval(() => {
+    if (countdown.value > 0) {
+      countdown.value--
+    } else {
+      clearInterval(timer)
+      timer = null
+    }
+  }, 1000)
 }
+
+// Resend OTP
+const resendOTP = async () => {
+  if (countdown.value > 0) return // prevent spam clicks
+
+  isResending.value = true
+  try {
+    await authStore.resendVerification()
+    startCooldown(180) // 3 minutes
+  } catch (err) {
+    console.error(err)
+    alert('Something went wrong. Please try again.')
+  } finally {
+    isResending.value = false
+  }
+}
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
 </script>

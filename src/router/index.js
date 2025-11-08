@@ -1,9 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { apiStatus } from '@/stores/apiStatus'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import Verification from '@/views/Verification.vue'
 import Form from '@/views/Student/Form.vue'
 import AdminDashboard from '@/views/Admin/AdminDashboard.vue'
+import ForgotPassword from '@/views/ForgotPassword.vue'
+import ApiStatus from '@/views/ApiStatus.vue'
 import { useAuthStore } from '@/stores/AuthStore'
 import { useAdminStore } from '@/stores/AdminStore'
 
@@ -29,6 +32,18 @@ const router = createRouter({
       meta: { guestOnly: true },
     },
     {
+      path: '/forgotPassword',
+      name: 'forgotPassword',
+      component: ForgotPassword,
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/apiStatus',
+      name: 'apiStatus',
+      component: ApiStatus,
+      meta: { guestOnly: true },
+    },
+    {
       path: '/',
       name: 'form',
       component: Form,
@@ -43,17 +58,49 @@ const router = createRouter({
   ],
 })
 
+async function checkApiConnection() {
+  try {
+    const res = await AuthService.ping()
+    apiStatus.reachable = !!res.success
+  } catch {
+    apiStatus.reachable = false
+  } finally {
+    apiStatus.checked = true
+  }
+}
+
+// ---- Router Guard ---- //
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const adminStore = useAdminStore()
 
-  // Skip auth check if already going to guest-only pages
+  if (to.name === 'apiStatus') {
+    await checkApiConnection()
+    if (apiStatus.reachable) {
+      return next({ name: 'login' })
+    }
+    return next()
+  }
+
+  if (!apiStatus.checked) {
+    await checkApiConnection()
+  }
+
+  if (!apiStatus.reachable) {
+    return next({ name: 'apiStatus' })
+  }
+
+  // 🚨 Verification protection
+  if (to.name === "verification" && !authStore.email) {
+    alert("Your verification session has expired. Please register again.")
+    return next("/register")
+  }
+
+  // 🧭 Guest-only routes
   if (to.meta.guestOnly) {
     try {
       await authStore.getUser()
       const userRole = authStore.role
-      
-      // If authenticated, redirect to appropriate dashboard
       if (userRole) {
         if (userRole === 'Admin') {
           await adminStore.fetchTeachers()
@@ -63,44 +110,31 @@ router.beforeEach(async (to, from, next) => {
           return next('/')
         }
       }
-      
-      // Not authenticated, allow access to guest pages
       return next()
-    } catch (error) {
-      // Not authenticated, allow access to guest pages
+    } catch {
       return next()
     }
   }
 
-  // For all other routes, check authentication
+  // 🔐 Auth routes
   try {
     await authStore.getUser()
     const userRole = authStore.role
 
-    // If route requires authentication
     if (to.meta.requiresAuth) {
-      if (!userRole) {
-        return next({ path: '/login' })
-      }
+      if (!userRole) return next({ path: '/login' })
 
-      // Check if user has permission for this route
       if (to.meta.role && to.meta.role !== userRole) {
-        if (userRole === 'Admin') {
-          return next('/adminDashboard')
-        } else {
-          return next('/')
-        }
+        return next(userRole === 'Admin' ? '/adminDashboard' : '/')
       }
-
-      return next()
     }
-    
-    // If route doesn't require auth → continue
+
     next()
-  } catch (error) {
-    // If getUser fails (401 Unauthorized) → redirect to login
+  } catch {
     return next({ path: '/login' })
   }
 })
+
+
 
 export default router

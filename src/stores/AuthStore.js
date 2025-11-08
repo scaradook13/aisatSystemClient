@@ -26,6 +26,11 @@ export const useAuthStore = defineStore('Auth', () => {
     const role = ref('')
     const isProfileComplete = ref(false)
     const isAuthenticated = ref(false)
+    const verificationCode = ref('')
+    const newPassword = ref('')
+    const isSending = ref(false)
+    const countdown = ref(0)
+    const timer = ref(null)
 
     const registerUser = async () => {
     try {
@@ -94,7 +99,7 @@ export const useAuthStore = defineStore('Auth', () => {
 
       } catch (err) {
         console.log(err);
-        toast.error("Verification failed! Please try again.");
+        toast.error(err.response?.data?.message);
       }
     };
 
@@ -157,9 +162,45 @@ export const useAuthStore = defineStore('Auth', () => {
     }
   }
 
+  const resendVerification = async () => {
+    try {
+      const result = await AuthService.resendVerification({ email: email.value });
+      toast.success(result.message);
+    } catch (err) {
+      console.log(err);
+      toast.error(err.response?.data?.message || "Something went wrong. Please try again.");
+    }
+  };
 
+  const requestForgotPassword = async () => {
+    if (!email.value) {
+      toast.error('Please enter your email first.')
+      throw new Error('Email missing')
+    }
+    try {
+      const result = await AuthService.requestForgotPassword({ email: email.value });
+      toast.success(result.message);
+      return result;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to send code.')
+      throw err;
+    }
+  };
 
-
+  const verifyForgotPassword = async () => {
+    try {
+      const result = await AuthService.verifyForgotPassword({ 
+        email: email.value,
+        otp: verificationCode.value,
+        newPassword: newPassword.value,
+        confirmPassword: confirmPassword.value
+       });
+      router.push({ name: 'login' })
+      toast.success(result.message);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Something went wrong. Please try again.");
+    }
+  };
 
   return { 
     id,
@@ -182,12 +223,20 @@ export const useAuthStore = defineStore('Auth', () => {
     role,
     isProfileComplete,
     isAuthenticated,
+    verificationCode,
+    newPassword,
+    isSending,
+    countdown,
+    timer,
 
 
     registerUser,
     verifyAccount,
     login,
     getUser,
-    logout
+    logout,
+    resendVerification,
+    requestForgotPassword,
+    verifyForgotPassword
    }
 })

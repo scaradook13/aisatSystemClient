@@ -144,7 +144,22 @@ class AdminService extends BaseService {
   async getAllActiveEvaluations() {
     const response = await this.api.get("/getAllActiveEvaluations");
     return response.data;
-  }   
+  }
+
+  async updateEnrolledStudent(id, payload) {
+    const response = await this.api.patch(`/updateEnrolledStudent/${id}`, payload);
+    return response.data;
+  }
+
+  async deleteEnrolledStudent(id) {
+    const response = await this.api.delete(`/deleteEnrolledStudent/${id}`);
+    return response.data;
+  }
+
+  async addFormCopy(payload) {
+    const response = await this.api.post("/addFormCopy", payload);
+    return response.data;
+  }
 }
 
 export default new AdminService();

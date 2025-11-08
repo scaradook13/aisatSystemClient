@@ -8,13 +8,29 @@
             <h1 class="text-2xl font-normal text-gray-900">Evaluation Form Settings</h1>
             <p class="text-sm text-gray-600 mt-1">Configure evaluation categories and questions</p>
           </div>
-          <button
-            @click="openNewFormModal = true"
-            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium shadow-sm"
-          >
-            <Plus class="w-5 h-5" />
-            Create New Form
-          </button>
+          <div class="flex items-center gap-3">
+            <!-- Create New Form -->
+            <button
+              @click="openFormModal('new')"
+              class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium shadow-sm"
+            >
+              <Plus class="w-5 h-5" />
+              Create New Form
+            </button>
+
+            <!-- Copy Previous Form -->
+            <button
+              @click="openFormModal('copy')"
+              class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium shadow-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 16h8M8 12h8m-6 8h8a2 2 0 002-2V8m-4 0V4H6a2 2 0 00-2 2v12a2 2 0 002 2h2" />
+              </svg>
+              Copy Previous Form
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -172,10 +188,18 @@
     <!-- MODALS -->
     <!-- New Form Modal -->
     <transition name="fade">
-      <div v-if="openNewFormModal" @click.self="openNewFormModal = false" class="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+      <div
+        v-if="openNewFormModal"
+        @click.self="openNewFormModal = false"
+        class="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm"
+      >
         <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl">
-          <h3 class="text-xl font-semibold text-gray-900 mb-4">Create New Form</h3>
-          <form @submit.prevent="createNewForm">
+          <!-- Dynamic Title -->
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            {{ formActionType === "copy" ? "Copy Previous Form" : "Create New Form" }}
+          </h3>
+
+          <form @submit.prevent="handleSubmitForm">
             <div class="mb-4">
               <label class="block text-gray-700 font-medium mb-2">Form Name</label>
               <input
@@ -186,15 +210,31 @@
                 required
               />
             </div>
+
             <div class="flex justify-end gap-3">
-              <button type="button" @click="openNewFormModal = false" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 font-medium transition-colors">Cancel</button>
-              <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium">Create</button>
+              <button
+                type="button"
+                @click="openNewFormModal = false"
+                class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 font-medium transition-colors"
+              >
+                Cancel
+              </button>
+
+              <!-- Dynamic Submit Button -->
+              <button
+                type="submit"
+                class="px-4 py-2 rounded-lg text-white transition-colors font-medium"
+                :class="formActionType === 'copy'
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-blue-600 hover:bg-blue-700'"
+              >
+                {{ formActionType === "copy" ? "Copy Form" : "Create" }}
+              </button>
             </div>
           </form>
         </div>
       </div>
     </transition>
-
     <!-- Edit Form Modal -->
     <transition name="fade">
       <div v-if="openEditFormModal" @click.self="openEditFormModal = false" class="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
@@ -379,7 +419,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed  } from 'vue'
 import { storeToRefs } from 'pinia'
 import { Edit, Plus } from 'lucide-vue-next'
 import { useAdminStore } from '@/stores/AdminStore'
@@ -392,6 +432,7 @@ const categories = ref([])
 
 // Modals
 const openNewFormModal = ref(false)
+const formActionType = ref("new");
 const newForm = ref({ name: '' })
 
 const openEditFormModal = ref(false)
@@ -468,21 +509,33 @@ onMounted(async () => {
   }
 })
 
-// New Form
-const createNewForm = async () => {
-  if (!newForm.value.name.trim()) return
-  
-  try {
-    await adminStore.addForm({ formDate: newForm.value.name, formData: [] })
-    newForm.value.name = ''
-    openNewFormModal.value = false
-    await adminStore.fetchActiveForm()
-    mapActiveFormToCategories()
-  } catch (error) {
-    console.error('Error creating form:', error)
-    alert('Failed to create form. Please try again.')
+const openFormModal = (type) => {
+  formActionType.value = type;
+  openNewFormModal.value = true;
+
+  // Optional: prefill when copying
+  if (type === "copy") {
+    newForm.value.name = "Copy of " + (adminStore.activeForm?.formDate || "");
+  } else {
+    newForm.value.name = "";
   }
-}
+};
+
+// New Form
+const handleSubmitForm = async () => {
+  try {
+    if (formActionType.value === "copy") {
+      await adminStore.addFormCopy({ formDate: newForm.value.name });
+    } else {
+      await adminStore.addForm({ formDate: newForm.value.name });
+    }
+    mapActiveFormToCategories()
+    openNewFormModal.value = false;
+    newForm.value.name = "";
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 // Edit Active Form
 const openEditFormModalHandler = () => {
@@ -572,7 +625,6 @@ const deleteCategoryConfirmed = async () => {
     await adminStore.deleteCategory(categoryToDelete.value._id)
     openDeleteCategoryModal.value = false
     openEditModal.value = false
-    await adminStore.fetchActiveForm()
     mapActiveFormToCategories()
   } catch (error) {
     console.error('Error deleting category:', error)
@@ -601,7 +653,8 @@ const deleteQuestion = (qIndex) => {
 // Confirm Delete Question
 const deleteQuestionConfirmed = async () => {
   if (questionToDeleteIndex.value === null) return
-  adminStore.deleteQuestion(editCategoryData.value.questions[questionToDeleteIndex.value]._id)
+  await adminStore.deleteQuestion(editCategoryData.value.questions[questionToDeleteIndex.value]._id)
+  mapActiveFormToCategories()
   editCategoryData.value.questions.splice(questionToDeleteIndex.value, 1)
   openDeleteQuestionModal.value = false
   questionToDeleteIndex.value = null

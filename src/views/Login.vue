@@ -72,12 +72,12 @@
 
         <!-- Forgot Password -->
         <div class="flex justify-end">
-          <a
-            href="#"
-            class="text-blue-600 text-sm sm:text-base font-medium hover:underline"
-          >
-            Forgot password?
-          </a>
+          <RouterLink
+          to="/forgotPassword"
+          class="text-blue-600 font-medium hover:underline"
+        >
+          Forgot password?
+        </RouterLink>
         </div>
 
         <!-- Sign In Button -->

@@ -321,6 +321,41 @@ export const useAdminStore = defineStore('Admin', () => {
     }
     };
 
+    const updateEnrolledStudent = async (id, payload) => {
+    try {
+      const response = await AdminService.updateEnrolledStudent(id, payload)
+      if (response.success) {
+        toast.success(response.message || "Enrolled Student updated successfully!")
+        await fetchEnrolledStudents()
+      } else toast.error(response.message)
+    } catch (err) {
+      handleError(err, "Failed to update Enrolled Student.")
+    }
+  }
+
+  const deleteEnrolledStudent = async (id) => {
+    try {
+      const response = await AdminService.deleteEnrolledStudent(id)
+      if (response.success) {
+        toast.success(response.message || "Enrolled Student deleted successfully!")
+        await fetchEnrolledStudents()
+      } else toast.error(response.message)
+    } catch (err) {
+      handleError(err, "Failed to delete Enrolled Student.")
+    }
+  }
+
+  const addFormCopy = async (payload) => {
+    try {
+      const response = await AdminService.addFormCopy(payload)
+      if (response.success) {
+        toast.success(response.message || "Form added successfully!")
+        await fetchActiveForm()
+      } else toast.error(response.message)
+    } catch (err) {
+      handleError(err, "Failed to add form.")
+    }
+  }
   return {
     teachers,
     sections,
@@ -347,6 +382,7 @@ export const useAdminStore = defineStore('Admin', () => {
     updateForm,
     deleteForm,
     fetchActiveEvaluations,
+    addFormCopy,
     // Categories
     addCategory,
     updateCategory,
@@ -359,6 +395,8 @@ export const useAdminStore = defineStore('Admin', () => {
     addEnrolledStudent,
     enrolledStudent,
     fetchEnrolledStudents,
-    addEnrolledStudentExcel
+    addEnrolledStudentExcel,
+    updateEnrolledStudent,
+    deleteEnrolledStudent
   }
 })

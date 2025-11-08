@@ -49,5 +49,41 @@ class AuthService extends BaseService {
       throw error;
     }
   }
+
+  async resendVerification(payload) {
+    try {
+      const response = await this.api.post("/resendVerification", payload);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async requestForgotPassword(payload) {
+    try {
+      const response = await this.api.post("/requestForgotPassword", payload);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async verifyForgotPassword(payload) {
+    try {
+      const response = await this.api.post("/verifyForgotPassword", payload);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async ping() {
+    try {
+      const response = await this.api.get("/ping");
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 export default new AuthService();
