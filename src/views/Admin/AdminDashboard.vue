@@ -133,9 +133,9 @@ const handleLogout = async () => {
   try {
     await authStore.logout()
     toast.success("Logged out successfully.")
-    // setTimeout(() => {
-    //   window.location.reload()
-    // }, 1000)
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   } catch (err) {
     console.error(err)
     toast.error("Logout failed.")

@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-class BaseService {
+class EmailService {
     constructor() {
         this.api = axios.create({
-            baseURL: 'https://aisatsystemapi.onrender.com/api/v1',
+            baseURL: 'https://aisat-gmail.vercel.app/api/v1',
             withCredentials: true,
         });
         // https://aisatsystemapi.onrender.com/api/v1 http://localhost:4000/api/v1
     }
 }
-export default BaseService;
+export default EmailService;

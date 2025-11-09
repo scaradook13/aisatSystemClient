@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import AuthService from '@/api/AuthService.js'
+import emailAuth from '@/api/emailAuth'
 import router from '@/router'
 import { defineStore } from 'pinia'
 import { useToast } from "vue-toastification";
@@ -164,7 +165,7 @@ export const useAuthStore = defineStore('Auth', () => {
 
   const resendVerification = async () => {
     try {
-      const result = await AuthService.resendVerification({ email: email.value });
+      const result = await emailAuth.resendVerification({ email: email.value });
       toast.success(result.message);
     } catch (err) {
       console.log(err);
@@ -178,7 +179,7 @@ export const useAuthStore = defineStore('Auth', () => {
       throw new Error('Email missing')
     }
     try {
-      const result = await AuthService.requestForgotPassword({ email: email.value });
+      const result = await emailAuth.requestForgotPassword({ email: email.value });
       toast.success(result.message);
       return result;
     } catch (err) {
