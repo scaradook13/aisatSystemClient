@@ -281,7 +281,7 @@ const newStudent = ref({
   firstName: "",
   middleName: "",
   lastName: "",
-  email: "",
+  studentEmail: "",
   section: "",
 });
 
@@ -290,7 +290,7 @@ const editableFields = {
   firstName: "First Name",
   middleName: "Middle Name",
   lastName: "Last Name",
-  email: "Email Address",
+  studentEmail: "Email Address",
   section: "Section",
 };
 
@@ -300,7 +300,7 @@ const closeAddModal = () => {
   showAddModal.value = false;
   newStudent.value = {
     studentNumber: "",
-    email: "",
+    studentEmail: "",
     firstName: "",
     middleName: "",
     lastName: "",
@@ -310,7 +310,7 @@ const closeAddModal = () => {
 
 const saveNewStudent = async () => {
   const s = newStudent.value;
-  if (!s.studentNumber || !s.firstName || !s.lastName || !s.email) {
+  if (!s.studentNumber || !s.firstName || !s.lastName || !s.studentEmail) {
     return toast.error("Please fill all required fields.");
   }
   await adminStore.addEnrolledStudent(s);
