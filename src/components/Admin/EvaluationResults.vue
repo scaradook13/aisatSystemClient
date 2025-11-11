@@ -184,7 +184,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import { storeToRefs } from "pinia";
 import { useAdminStore } from '@/stores/AdminStore';
 
@@ -262,7 +261,6 @@ onMounted(async () => {
   await adminStore.fetchTeachers();
   await adminStore.fetchActiveForm();
   await adminStore.fetchActiveEvaluations();
-  console.log(evaluations)
   if (teachers.value.length > 0) {
     selectTeacher(teachers.value[0]);
   }

@@ -12,6 +12,7 @@ export const useAdminStore = defineStore('Admin', () => {
   const activeForm = ref([])
   const enrolledStudent = ref([])
   const evaluations = ref([])
+  const admins = ref([])
 
   // --- Helper for consistent error handling ---
   const handleError = (err, fallbackMessage) => {
@@ -356,12 +357,58 @@ export const useAdminStore = defineStore('Admin', () => {
       handleError(err, "Failed to add form.")
     }
   }
+
+  const addAdmin = async (payload) => {
+    try {
+      const response = await AdminService.addAdmin(payload)
+      if (response.success) {
+        toast.success(response.message || "Admin added successfully!")
+        await fetchAdmins()
+      } else toast.error(response.message)
+    } catch (err) {
+      handleError(err, "An unexpected error occurred while adding the admin.")
+    }
+  }
+
+  const fetchAdmins = async () => {
+    try {
+      const response = await AdminService.getAdmin()
+      admins.value = response.data || []
+    } catch (err) {
+      handleError(err, "Failed to fetch admins.")
+    }
+  }
+
+  const updateAdmin = async (id, payload) => {
+    try {
+      const response = await AdminService.updateAdmin(id, payload)
+      if (response.success) {
+        toast.success(response.message || "Admin updated successfully!")
+        await fetchAdmins()
+      } else toast.error(response.message)
+    } catch (err) {
+      handleError(err, "Failed to update admin.")
+    }
+  }
+
+  const deleteAdmin = async (id) => {
+    try {
+      const response = await AdminService.deleteAdmin(id)
+      if (response.success) {
+        toast.success(response.message || "Admin deleted successfully!")
+        await fetchAdmins()
+      } else toast.error(response.message)
+    } catch (err) {
+      handleError(err, "Failed to delete admin.")
+    }
+  }
   return {
     teachers,
     sections,
     students,
     activeForm,
     evaluations,
+    admins,
     // Teachers
     addTeacher,
     updateTeacher,
@@ -397,6 +444,11 @@ export const useAdminStore = defineStore('Admin', () => {
     fetchEnrolledStudents,
     addEnrolledStudentExcel,
     updateEnrolledStudent,
-    deleteEnrolledStudent
+    deleteEnrolledStudent,
+    // Admins
+    addAdmin,
+    fetchAdmins,
+    updateAdmin,
+    deleteAdmin,
   }
 })

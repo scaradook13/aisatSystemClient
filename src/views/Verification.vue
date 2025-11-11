@@ -122,7 +122,6 @@ const resendOTP = async () => {
     await authStore.resendVerification()
     startCooldown(180) // 3 minutes
   } catch (err) {
-    console.error(err)
     alert('Something went wrong. Please try again.')
   } finally {
     isResending.value = false

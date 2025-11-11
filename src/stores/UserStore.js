@@ -13,7 +13,6 @@ export const useUserStore = defineStore('User', () => {
 
   const setRating = (questionId, rating) => {
     ratings.value[questionId] = rating;
-    console.log(ratings.value)
   };
 
   const addEvaluation = async () => {
@@ -25,11 +24,9 @@ export const useUserStore = defineStore('User', () => {
       comment: comment.value
     })
       try {
-        console.log(payload)
         const response = await UserService.addEvaluation(payload)
 
       } catch (err) {
-        console.error(err)
         toast.error("Failed to submit Evaluation.")
       }
     }
@@ -37,7 +34,6 @@ export const useUserStore = defineStore('User', () => {
     const fetchStudentInfo = async () => {
       try {
         const response = await UserService.getStudentInfo()
-        console.log("Full student info response:", response)
 
         const userData = response.data // 👈 correct level
 
@@ -45,9 +41,7 @@ export const useUserStore = defineStore('User', () => {
         section.value = userData.profile.section
         teacherEvaluated.value = userData.profile.teacherEvaluated || []
 
-        console.log("Fetched teacherEvaluated:", teacherEvaluated.value)
       } catch (err) {
-        console.error(err)
         toast.error("Failed to get student data.")
       }
     }

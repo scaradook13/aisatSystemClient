@@ -505,7 +505,6 @@ onMounted(async () => {
     await adminStore.fetchActiveForm()
     mapActiveFormToCategories()
   } catch (error) {
-    console.error('Error fetching active form:', error)
   }
 })
 
@@ -533,7 +532,6 @@ const handleSubmitForm = async () => {
     openNewFormModal.value = false;
     newForm.value.name = "";
   } catch (error) {
-    console.error(error);
   }
 };
 
@@ -558,7 +556,6 @@ const saveForm = async () => {
     await adminStore.fetchActiveForm()
     mapActiveFormToCategories()
   } catch (error) {
-    console.error('Error updating form:', error)
     alert('Failed to update form. Please try again.')
   }
 }
@@ -606,7 +603,6 @@ const saveCategory = async () => {
     await adminStore.fetchActiveForm()
     mapActiveFormToCategories()
   } catch (error) {
-    console.error('Error saving category:', error)
     alert('Failed to save category. Please try again.')
   }
 }
@@ -627,7 +623,6 @@ const deleteCategoryConfirmed = async () => {
     openEditModal.value = false
     mapActiveFormToCategories()
   } catch (error) {
-    console.error('Error deleting category:', error)
     alert('Failed to delete category. Please try again.')
   } finally {
     categoryToDelete.value = null
@@ -683,7 +678,6 @@ const createNewCategory = async () => {
     await adminStore.fetchActiveForm()
     mapActiveFormToCategories()
   } catch (error) {
-    console.error('Error creating category:', error)
     alert('Failed to create category. Please try again.')
   }
 }

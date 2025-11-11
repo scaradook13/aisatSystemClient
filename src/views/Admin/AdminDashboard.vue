@@ -3,6 +3,7 @@
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-20">
       <div class="px-4 py-4 flex items-center justify-between">
+        <!-- Left side -->
         <div class="flex items-center gap-3">
           <button
             @click="isSidebarOpen = !isSidebarOpen"
@@ -12,29 +13,61 @@
           </button>
           <h1 class="text-xl font-bold text-gray-900">AISAT Admin</h1>
         </div>
+
+        <!-- Logout Button -->
         <button
           @click="handleLogout"
-          class="flex items-center gap-2 bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 transition-all rounded-lg px-3 py-2 shadow-sm text-sm font-medium"
+          :disabled="isLoggingOut"
+          class="flex items-center gap-2 bg-gray-50 text-gray-700 border border-gray-300 
+                hover:bg-gray-100 hover:text-gray-900 transition-all rounded-lg px-3 py-2 
+                shadow-sm text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
-            />
-          </svg>
-          <span class="hidden sm:inline">Logout</span>
+          <!-- Loading spinner -->
+          <template v-if="isLoggingOut">
+            <svg
+              class="animate-spin h-5 w-5 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 11-8 8z"
+              ></path>
+            </svg>
+            <span>Logging out...</span>
+          </template>
+
+          <!-- Default icon + text -->
+          <template v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
+              />
+            </svg>
+            <span class="hidden sm:inline">Logout</span>
+          </template>
         </button>
       </div>
     </header>
-
     <!-- Overlay when sidebar open -->
     <div
       v-if="isSidebarOpen"
@@ -78,7 +111,7 @@
 <script setup>
 import {
   Menu, X, Home, Users, BookOpen, GraduationCap,
-  FileEdit, Award
+  FileEdit, Award,UserStar
 } from 'lucide-vue-next'
 import { ref, computed } from 'vue'
 import { useToast } from "vue-toastification";
@@ -96,6 +129,7 @@ import EvaluationForm from '@/components/Admin/EvaluationForm.vue'
 import Ranking from '@/components/Admin/Ranking.vue'
 import EnrolledStudents from '@/components/Admin/EnrolledStudents.vue'
 import EvaluationResults from '@/components/Admin/EvaluationResults.vue'
+import AdminSettings from '@/components/Admin/AdminSettings.vue';
 
 const isSidebarOpen = ref(false)
 const activeTab = ref('overview')
@@ -109,6 +143,7 @@ const tabs = [
   { id: 'students', label: 'Registered Students', icon: GraduationCap },
   { id: 'evaluationResults', label: 'Evaluation Results', icon: Award },
   { id: 'ranking', label: 'Rankings', icon: Award },
+  { id: 'adminSettings', label: 'Admin Settings', icon: UserStar },
 ]
 
 const componentsMap = {
@@ -119,7 +154,8 @@ const componentsMap = {
   evaluation: EvaluationForm,
   ranking: Ranking,
   enrolledStudents: EnrolledStudents,
-  evaluationResults: EvaluationResults
+  evaluationResults: EvaluationResults,
+  adminSettings: AdminSettings
 }
 
 const currentComponent = computed(() => componentsMap[activeTab.value])
@@ -128,17 +164,20 @@ const setTab = (tab) => {
   activeTab.value = tab
   isSidebarOpen.value = false
 }
+const isLoggingOut = ref(false)
 
 const handleLogout = async () => {
   try {
+    isLoggingOut.value = true
     await authStore.logout()
-    toast.success("Logged out successfully.")
+    toast.success('Logged out successfully.')
     setTimeout(() => {
       window.location.reload()
-    }, 1000)
+    }, 100)
   } catch (err) {
-    console.error(err)
-    toast.error("Logout failed.")
+    toast.error('Logout failed.')
+  } finally {
+    isLoggingOut.value = false
   }
 }
 </script>

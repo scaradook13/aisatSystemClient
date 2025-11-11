@@ -160,6 +160,27 @@ class AdminService extends BaseService {
     const response = await this.api.post("/addFormCopy", payload);
     return response.data;
   }
+
+  async addAdmin(payload) {
+    const response = await this.api.post("/createAdmin", payload);
+    return response.data;
+  }
+
+  async getAdmin(id = null) {
+    const response = await this.api.get("/getAllAdmin");
+    return response.data;
+  }
+
+  async updateAdmin(id, payload) {
+    const response = await this.api.patch(`/updateAdmin/${id}`, payload);
+    return response.data;
+  }
+
+  async deleteAdmin(id) {
+    const response = await this.api.delete(`/deleteAdmin/${id}`);
+    return response.data;
+  }
+
 }
 
 export default new AdminService();

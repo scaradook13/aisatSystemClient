@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10 px-4">
+  <div class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-10 px-4">
     <div class="max-w-5xl mx-auto space-y-8">
     <!-- Header -->
     <header
@@ -16,26 +16,57 @@
       </div>
 
       <!-- Logout Button -->
-      <div class="mt-3 md:mt-0 flex justify-center md:justify-end flex-shrink-0">
+      <div class="mt-3 md:mt-0 flex justify-center md:justify-end shrink-0">
         <button
           @click="handleLogout"
-          class="flex items-center gap-2 bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 transition-all rounded-lg px-3 py-2 shadow-sm text-sm font-medium"
+          :disabled="isLoggingOut"
+          class="flex items-center gap-2 bg-gray-50 text-gray-700 border border-gray-300 
+                hover:bg-gray-100 hover:text-gray-900 transition-all rounded-lg px-3 py-2 
+                shadow-sm text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
-            />
-          </svg>
-          <span class="hidden sm:inline">Logout</span>
+          <!-- Spinner when loading -->
+          <template v-if="isLoggingOut">
+            <svg
+              class="animate-spin h-5 w-5 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 11-8 8z"
+              ></path>
+            </svg>
+            <span>Logging out...</span>
+          </template>
+
+          <!-- Default logout icon/text -->
+          <template v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
+              />
+            </svg>
+            <span class="hidden sm:inline">Logout</span>
+          </template>
         </button>
       </div>
     </header>
@@ -44,7 +75,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Section Card -->
         <div
-          class="p-5 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md flex justify-between items-center"
+          class="p-5 rounded-2xl bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-md flex justify-between items-center"
         >
           <div>
             <p class="text-sm opacity-90">Your Section</p>
@@ -57,7 +88,7 @@
 
         <!-- Progress Card -->
         <div
-          class="p-5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+          class="p-5 rounded-2xl bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-md"
         >
           <div class="flex justify-between items-center mb-1">
             <p class="text-sm opacity-90">Progress</p>
@@ -76,7 +107,7 @@
 
         <!-- Teachers Card -->
         <div
-          class="p-5 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md flex justify-between items-center"
+          class="p-5 rounded-2xl bg-linear-to-r from-green-500 to-emerald-600 text-white shadow-md flex justify-between items-center"
         >
           <div>
             <p class="text-sm opacity-90">Available Teachers</p>
@@ -360,7 +391,6 @@ const addEvaluationHandler = async () => {
     showSuccessModal.value = true
     showValidationErrors.value = false // reset validation after success
   } catch (err) {
-    console.error("Error submitting evaluation:", err)
     toast.error("Something went wrong. Please try again.")
   } finally {
     isSubmitting.value = false
@@ -378,16 +408,20 @@ const handleSubmitAnother = async () => {
   showSuccessModal.value = false;
 };
 
+const isLoggingOut = ref(false)
+
 const handleLogout = async () => {
   try {
+    isLoggingOut.value = true
     await authStore.logout()
     toast.success("Logged out successfully.")
     setTimeout(() => {
       window.location.reload()
-    }, 1000)
+    }, 100)
   } catch (err) {
-    console.error(err)
     toast.error("Logout failed.")
+  } finally {
+    isLoggingOut.value = false
   }
 }
 

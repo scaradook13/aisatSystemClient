@@ -155,7 +155,7 @@ onMounted(async () => {
   await adminStore.fetchActiveEvaluations()
 })
 
-// 🧮 Compute each teacher’s average rating and total evaluations
+//  Compute each teacher’s average rating and total evaluations
 const rankedTeachers = computed(() => {
   if (!teachers.value.length || !evaluations.value.length) return []
 

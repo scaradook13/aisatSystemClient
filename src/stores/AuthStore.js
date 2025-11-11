@@ -65,7 +65,6 @@ export const useAuthStore = defineStore('Auth', () => {
       router.push({ name: 'verification' })
 
     } catch (err) {
-      console.log(err)
 
       const errorMessage =
         err.response?.data?.message ||
@@ -101,7 +100,6 @@ export const useAuthStore = defineStore('Auth', () => {
         }
 
       } catch (err) {
-        console.log(err);
         toast.error(err.response?.data?.message);
       }
     };
@@ -131,7 +129,6 @@ export const useAuthStore = defineStore('Auth', () => {
         toast.success("Login successful!");
 
       } catch (err) {
-        console.log(err);
         toast.error(err.response?.data || "Something went wrong. Please try again.");
       }
     };
@@ -160,7 +157,6 @@ export const useAuthStore = defineStore('Auth', () => {
       const response = await AuthService.logout()
 
     } catch (error) {
-      console.error('Failed to logout', error)
       throw error
     }
   }
@@ -170,7 +166,6 @@ export const useAuthStore = defineStore('Auth', () => {
       const result = await emailAuth.resendVerification({ email: email.value });
       toast.success(result.message);
     } catch (err) {
-      console.log(err);
       toast.error(err.response?.data?.message || "Something went wrong. Please try again.");
     }
   };
@@ -216,7 +211,6 @@ export const useAuthStore = defineStore('Auth', () => {
     // Step 3: Send token to backend for verification
     const response = await AuthService.loginWithGoogle({ idToken });
 
-    console.log("Google Login Response:", response);
 
     // Step 4: Handle backend response
     if (response.success) {
@@ -229,8 +223,7 @@ export const useAuthStore = defineStore('Auth', () => {
     } else {
       toast.error(response.message || "Google sign-in failed.");
     }
-  } catch (error) {
-    console.error("Google sign-in error:", error);
+  } catch (error) {;
     toast.error(error.message || "Failed to sign in with Google.");
   }
 };
