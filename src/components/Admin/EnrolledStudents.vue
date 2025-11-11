@@ -86,6 +86,7 @@
             <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm text-gray-700 font-medium">
               <tr>
                 <th class="px-4 py-3 border-b">Student Number</th>
+                <th class="px-4 py-3 border-b">Email</th>
                 <th class="px-4 py-3 border-b">First Name</th>
                 <th class="px-4 py-3 border-b">Middle Name</th>
                 <th class="px-4 py-3 border-b">Last Name</th>
@@ -96,6 +97,7 @@
             <tbody>
               <tr v-for="student in filteredStudents" :key="student._id" class="hover:bg-blue-50 transition-colors">
                 <td class="px-4 py-2 border-b">{{ student.studentNumber }}</td>
+                <td class="px-4 py-2 border-b">{{ student.studentEmail || '-' }}</td>
                 <td class="px-4 py-2 border-b capitalize">{{ student.firstName }}</td>
                 <td class="px-4 py-2 border-b capitalize">{{ student.middleName || '-' }}</td>
                 <td class="px-4 py-2 border-b capitalize">{{ student.lastName }}</td>
@@ -235,6 +237,7 @@ const handleFileUpload = (e) => {
         firstName: r["first name"] || "",
         middleName: r["middle name"] || "",
         lastName: r["last name"] || "",
+        studentEmail: r["email"] || "",
         section: r["section"] || "",
       }));
 
@@ -278,6 +281,7 @@ const newStudent = ref({
   firstName: "",
   middleName: "",
   lastName: "",
+  email: "",
   section: "",
 });
 
@@ -286,6 +290,7 @@ const editableFields = {
   firstName: "First Name",
   middleName: "Middle Name",
   lastName: "Last Name",
+  email: "Email Address",
   section: "Section",
 };
 
@@ -295,6 +300,7 @@ const closeAddModal = () => {
   showAddModal.value = false;
   newStudent.value = {
     studentNumber: "",
+    email: "",
     firstName: "",
     middleName: "",
     lastName: "",
@@ -304,7 +310,7 @@ const closeAddModal = () => {
 
 const saveNewStudent = async () => {
   const s = newStudent.value;
-  if (!s.studentNumber || !s.firstName || !s.lastName) {
+  if (!s.studentNumber || !s.firstName || !s.lastName || !s.email) {
     return toast.error("Please fill all required fields.");
   }
   await adminStore.addEnrolledStudent(s);

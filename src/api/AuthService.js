@@ -85,5 +85,14 @@ class AuthService extends BaseService {
       throw error;
     }
   }
+
+  async loginWithGoogle(payload) {
+    try {
+      const response = await this.api.post("/google", payload);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 export default new AuthService();

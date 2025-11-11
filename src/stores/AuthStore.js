@@ -5,6 +5,8 @@ import router from '@/router'
 import { defineStore } from 'pinia'
 import { useToast } from "vue-toastification";
 const toast = useToast();
+import { signInWithPopup, auth, provider } from "@/firebaseConfig";
+
 
 export const useAuthStore = defineStore('Auth', () => {
     const id = ref('')
@@ -203,6 +205,37 @@ export const useAuthStore = defineStore('Auth', () => {
     }
   };
 
+  const loginWithGoogle = async () => {
+  try {
+    // Step 1: Trigger Google sign-in popup
+    const result = await signInWithPopup(auth, provider);
+
+    // Step 2: Get Firebase ID token
+    const idToken = await result.user.getIdToken();
+
+    // Step 3: Send token to backend for verification
+    const response = await AuthService.loginWithGoogle({ idToken });
+
+    console.log("Google Login Response:", response);
+
+    // Step 4: Handle backend response
+    if (response.success) {
+      const user = response.user;
+
+      email.value = user.email || "";
+
+      toast.success("Signed in with Google successfully!");
+      router.push({ name: "form" });
+    } else {
+      toast.error(response.message || "Google sign-in failed.");
+    }
+  } catch (error) {
+    console.error("Google sign-in error:", error);
+    toast.error(error.message || "Failed to sign in with Google.");
+  }
+};
+
+
   return { 
     id,
     studentNumber,
@@ -238,6 +271,7 @@ export const useAuthStore = defineStore('Auth', () => {
     logout,
     resendVerification,
     requestForgotPassword,
-    verifyForgotPassword
+    verifyForgotPassword,
+    loginWithGoogle
    }
 })
