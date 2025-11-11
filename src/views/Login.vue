@@ -15,9 +15,9 @@
         >
           Login Portal
         </h1>
-        <p class="text-gray-500 text-sm sm:text-base text-center mt-1">
+        <!-- <p class="text-gray-500 text-sm sm:text-base text-center mt-1">
           Access your student or admin account
-        </p>
+        </p> -->
       </div>
 
       <!-- Form -->
